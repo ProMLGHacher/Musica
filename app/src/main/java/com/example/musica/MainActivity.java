@@ -206,9 +206,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                 }
             }
         });
-
-
-
     }
 
     private void setDisLike() {
@@ -257,6 +254,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                         musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
                         try {
+
                             mPlayer.setDataSource(musicInfo.getMusicURL());
 
                             mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -366,8 +364,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         } else {
             musicPosForPlaying -= 1;
 
-            stop();
-            mPlayer.reset();
             String fileNamesGet = previousTracksArrayList.get(musicPosForPlaying);
             firebaseDatabase.getReference("lastMusicName").setValue(fileNamesGet);
 
@@ -378,6 +374,8 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                     musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
                     try {
+                        stop();
+                        mPlayer.reset();
                         mPlayer.setDataSource(musicInfo.getMusicURL());
 
                         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
