@@ -4,10 +4,12 @@ package com.example.musica;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -238,123 +240,147 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     int randomTrackCount;
     int count;
     boolean getWhile;
+    int childrenCount;
     public void nextTrack() {
 
-        if (musicPosForPlaying != previousTracksArrayList.size()-1) {
-            if (previousTracksArrayList.size() > 1) {
+        Log.e("FIRST", previousTracksArrayList.toString());
+        Log.e ("FIRST", String.valueOf(musicPosForPlaying));
+        DatabaseReference nextTrackDataBase = firebaseDatabase.getReference("tracksInfo");
 
-                musicPosForPlaying += 1;
+        nextTrackDataBase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                childrenCount = (int)snapshot.getChildrenCount();
 
-                stop();
-                mPlayer.reset();
-                String fileNamesGet = previousTracksArrayList.get(musicPosForPlaying);
-                firebaseDatabase.getReference("lastMusicName").setValue(fileNamesGet);
 
-                firebaseDatabase.getReference("tracksInfo").child(fileNamesGet).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (childrenCount == previousTracksArrayList.size()) {
+                    Toast.makeText(MainActivity.this, "К СОЖАЛЕНИЮ ТРЕКИ НА СЕРВЕРЕ ЗАКОНЧИЛИСЬ", Toast.LENGTH_LONG).show();
+                } else if (musicPosForPlaying != previousTracksArrayList.size()-1) {
+                    if (previousTracksArrayList.size() > 1) {
 
-                        musicInfo = dataSnapshot.getValue(MusicInfo.class);
+                        musicPosForPlaying += 1;
 
-                        try {
-                            mPlayer.setDataSource(musicInfo.getMusicURL());
+                        String fileNamesGet = previousTracksArrayList.get(musicPosForPlaying);
+                        firebaseDatabase.getReference("lastMusicName").setValue(fileNamesGet);
 
-                            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                @Override
-                                public void onPrepared(MediaPlayer mp) {
-                                    play();
-                                }
-                            });
+                        firebaseDatabase.getReference("tracksInfo").child(fileNamesGet).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                            mPlayer.prepareAsync();
+                                musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                    }
-                });
-
-            }
-        } else {
-            firebaseDatabase.getReference("tracksInfo").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                    randomTrackCount = 0;
-                    count = 0;
-                    getWhile = true;
-
-                    while (getWhile) {
-
-                        count = 0;
-                        randomTrackCount = random.nextInt((int) dataSnapshot.getChildrenCount());
-                        System.out.println("1 - " + previousTracksArrayList.toString());
-                        System.out.println("1 - " + randomTrackCount);
-
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            if (count != randomTrackCount) {
-                                count +=  1;
-                            } else {
-                                MusicInfo musicInfoInWhile;
-                                musicInfoInWhile = child.getValue(MusicInfo.class);
-                                String musicNameInWhile = musicInfoInWhile.getMusicName() + "_" + musicInfoInWhile.getArtist();
-
-                                if (!previousTracksArrayList.contains(musicNameInWhile)){
-                                    getWhile = false;
-
-                                    if ( ! previousTracksArrayList.contains(musicInfo.getMusicName() + "_" + musicInfo.getArtist())) {
-                                        previousTracksArrayList.add(musicInfo.getMusicName() + "_" + musicInfo.getArtist());
-                                    }
-                                    musicPosForPlaying = previousTracksArrayList.size()-1;
-
-                                    musicInfo = child.getValue(MusicInfo.class);
-
-                                    if ( ! previousTracksArrayList.contains(musicInfo.getMusicName() + "_" + musicInfo.getArtist())) {
-                                        previousTracksArrayList.add(musicInfo.getMusicName() + "_" + musicInfo.getArtist());
-                                    }
-                                    musicPosForPlaying = previousTracksArrayList.size()-1;
-
+                                try {
                                     stop();
                                     mPlayer.reset();
-                                    String setDataSourceURL = musicInfo.getMusicURL();
 
-                                    firebaseDatabase.getReference("lastMusicName").setValue(musicInfo.getMusicName() + "_" + musicInfo.getArtist());
+                                    mPlayer.setDataSource(musicInfo.getMusicURL());
 
-                                    try {
-                                        mPlayer.setDataSource(setDataSourceURL);
+                                    mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                        @Override
+                                        public void onPrepared(MediaPlayer mp) {
+                                            play();
+                                        }
+                                    });
 
-                                        mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                                            @Override
-                                            public void onPrepared(MediaPlayer mp) {
-                                                play();
+                                    mPlayer.prepareAsync();
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Log.e("SECOND", previousTracksArrayList.toString());
+                                Log.e("SECOND", String.valueOf(musicPosForPlaying));
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                } else {
+                    firebaseDatabase.getReference("tracksInfo").addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                            randomTrackCount = 0;
+                            count = 0;
+                            getWhile = true;
+
+                            while (getWhile) {
+
+                                count = 0;
+                                randomTrackCount = random.nextInt((int) dataSnapshot.getChildrenCount());
+
+                                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                                    if (count != randomTrackCount) {
+                                        count +=  1;
+                                    } else {
+                                        MusicInfo musicInfoInWhile;
+                                        musicInfoInWhile = child.getValue(MusicInfo.class);
+                                        String musicNameInWhile = musicInfoInWhile.getMusicName() + "_" + musicInfoInWhile.getArtist();
+
+                                        if (!previousTracksArrayList.contains(musicNameInWhile)) {
+                                            getWhile = false;
+
+                                            previousTracksArrayList.add(musicNameInWhile);
+
+                                            musicPosForPlaying = previousTracksArrayList.size()-1;
+
+                                            musicInfo = child.getValue(MusicInfo.class);
+
+                                            String setDataSourceURL = musicInfo.getMusicURL();
+
+                                            firebaseDatabase.getReference("lastMusicName").setValue(musicInfo.getMusicName() + "_" + musicInfo.getArtist());
+
+                                            try {
+                                                stop();
+                                                mPlayer.reset();
+
+                                                mPlayer.setDataSource(setDataSourceURL);
+
+                                                mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                                                    @Override
+                                                    public void onPrepared(MediaPlayer mp) {
+                                                        play();
+                                                    }
+                                                });
+
+                                                mPlayer.prepareAsync();
+
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
                                             }
-                                        });
 
-                                        mPlayer.prepareAsync();
-
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                        } else {
+                                            break;
+                                        }
                                     }
-                                } else {
-                                    break;
                                 }
                             }
+
+                            Log.e("SECOND2", previousTracksArrayList.toString());
+                            Log.e("SECOND2", String.valueOf(musicPosForPlaying));
+
                         }
-                    }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                }
-            });
-        }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     public void previousTrack() {
@@ -364,10 +390,13 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         } else if (previousTracksArrayList.size() <= 1) {
             //code
         } else {
+
+            Log.e("LAST", previousTracksArrayList.toString());
+            Log.e ("LAST", String.valueOf(musicPosForPlaying));
+
             musicPosForPlaying -= 1;
 
-            stop();
-            mPlayer.reset();
+
             String fileNamesGet = previousTracksArrayList.get(musicPosForPlaying);
             firebaseDatabase.getReference("lastMusicName").setValue(fileNamesGet);
 
@@ -378,6 +407,9 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                     musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
                     try {
+                        stop();
+                        mPlayer.reset();
+
                         mPlayer.setDataSource(musicInfo.getMusicURL());
 
                         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
