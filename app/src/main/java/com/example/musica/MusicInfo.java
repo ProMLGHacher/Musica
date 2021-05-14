@@ -37,4 +37,7 @@ public class MusicInfo {
     public void setArtist(String artist) {
         this.artist = artist;
     }
+
+
+
 }
