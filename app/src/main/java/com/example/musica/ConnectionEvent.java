@@ -3,6 +3,9 @@ package com.example.musica;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
+import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -15,20 +18,37 @@ public class ConnectionEvent {
         onConnectionListener = listener;
     }
 
+    Thread myThread;
+
     public void doEvent(Context context) {
 
-        while (true) {
-            ConnectivityManager cm =
-                    (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-            if (netInfo != null && netInfo.isConnectedOrConnecting())
-            {
+        myThread = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    ConnectivityManager cm =
+                            (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo netInfo = cm.getActiveNetworkInfo();
+                    if (netInfo != null && netInfo.isConnectedOrConnecting())
+                    {
 
-            } else {
-                onConnectionListener.onEvent();
-                Toast.makeText(context, "Нет подключения к интернету!", Toast.LENGTH_LONG).show();
-                break;
+                    } else {
+                        destroyThread();
+                        break;
+                    }
+                }
             }
-        }
+        };
+
+        myThread.start();
+
+    }
+
+    Thread thread;
+
+    public void destroyThread() {
+        myThread.interrupt();
+        Looper.prepare();
+        onConnectionListener.onEvent();
     }
 }

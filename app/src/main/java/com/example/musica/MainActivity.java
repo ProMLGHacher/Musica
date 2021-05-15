@@ -78,16 +78,16 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        ConnectionEvent connectionEvent = new ConnectionEvent();
-
-        connectionEvent.setOnConnectionListener(new OnConnectionListener() {
-            @Override
-            public void onEvent() {
-                Log.e("UIGBHYHUIWKEFBIUYRWBIUYFBIURWBIFBHIOURWBFIUBERWIUBFIUYWERUIYBFUERWBHIUFBIUERWBFUBU", "IUGHBRYUIFBGEIYUFBHIUREHBIUFBGIUERIUYBGVFIRUYEFYGBERIUHFB");
-            }
-        });
-
-        connectionEvent.doEvent(this);
+//        ConnectionEvent connectionEvent = new ConnectionEvent();
+//
+//        connectionEvent.setOnConnectionListener(new OnConnectionListener() {
+//            @Override
+//            public void onEvent() {
+//                makeToastNotInternetConnection();
+//            }
+//        });
+//
+//        connectionEvent.doEvent(this);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -560,6 +560,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
             return true;
         }
         return false;
+    }
+
+    public void makeToastNotInternetConnection() {
+        Toast.makeText(MainActivity.this, "Нет подключения к интернету!", Toast.LENGTH_LONG).show();
     }
 
 
