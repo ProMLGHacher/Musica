@@ -169,7 +169,7 @@
         android:id="@+id/playlistText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text='Плейлист ""'
+        android:text='Плейлист "Рандомный тречок"'
         android:textSize="15sp"
         app:layout_constraintEnd_toEndOf="@+id/nowPlayingText"
         app:layout_constraintStart_toStartOf="@+id/nowPlayingText"
