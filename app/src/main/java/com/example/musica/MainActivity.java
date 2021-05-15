@@ -2,9 +2,12 @@ package com.example.musica;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -74,6 +77,17 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         setContentView(R.layout.activity_main);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        ConnectionEvent connectionEvent = new ConnectionEvent();
+
+        connectionEvent.setOnConnectionListener(new OnConnectionListener() {
+            @Override
+            public void onEvent() {
+                Log.e("UIGBHYHUIWKEFBIUYRWBIUYFBIURWBIFBHIOURWBFIUBERWIUBFIUYWERUIYBFUERWBHIUFBIUERWBFUBU", "IUGHBRYUIFBGEIYUFBHIUREHBIUFBGIUERIUYBGVFIRUYEFYGBERIUHFB");
+            }
+        });
+
+        connectionEvent.doEvent(this);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
@@ -535,4 +549,20 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         myThread.start();
 
     }
+
+    public static boolean isOnline(Context context)
+    {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        if (netInfo != null && netInfo.isConnectedOrConnecting())
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+
+
 }
