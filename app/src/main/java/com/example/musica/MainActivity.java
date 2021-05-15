@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         Log.e("FIRST", previousTracksArrayList.toString());
         Log.e ("FIRST", String.valueOf(musicPosForPlaying));
+
         DatabaseReference nextTrackDataBase = firebaseDatabase.getReference("tracksInfo");
 
         nextTrackDataBase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
                                 @Override
                                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                                    //CODE
                                 }
                             });
 
@@ -366,6 +367,8 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                                                     });
 
                                                     mPlayer.prepareAsync();
+
+                                                    break;
 
                                                 } catch (IOException e) {
                                                     e.printStackTrace();
