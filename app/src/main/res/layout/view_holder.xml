@@ -25,6 +25,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/coverImageView"
                 android:layout_width="250dp"
                 android:layout_height="250dp"
                 android:layout_gravity="center"

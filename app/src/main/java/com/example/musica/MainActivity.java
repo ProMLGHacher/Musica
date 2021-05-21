@@ -40,9 +40,14 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
     ArrayList<String> previousTracksArrayList = new ArrayList<>();
 
+    static String coverURL;
+
     MediaPlayer mPlayer;
 
     Random random = new Random();
+
+    MyAdapter adapter = new MyAdapter(MainActivity.this);
+    RecyclerView previewRecyclerView;
 
     FloatingActionButton playButton;
     SeekBar seekBar;
@@ -66,6 +71,9 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     boolean isLike = false;
     boolean isDisLike = false;
     String lastMusicName;
+
+    public static int rvPos;
+
 
     MusicInfo musicInfo;
 
@@ -103,12 +111,11 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         seekBar = findViewById(R.id.seekBar);
         seekBar.setOnSeekBarChangeListener(this);
 
-        RecyclerView previewRecyclerView = findViewById(R.id.coverRV);
+        previewRecyclerView = findViewById(R.id.coverRV);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         previewRecyclerView.setLayoutManager(linearLayoutManager);
-        previewRecyclerView.scrollToPosition(1);
 
-        MyAdapter adapter = new MyAdapter();
+        adapter = new MyAdapter(MainActivity.this);
         previewRecyclerView.setAdapter(adapter);
 
         SnapHelper snapHelper = new LinearSnapHelper();
@@ -137,6 +144,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                         musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
                         String setDataSourceURL = musicInfo.getMusicURL();
+
+                        coverURL = musicInfo.getCoverURL();
+                        adapter.notifyDataSetChanged();
+                        previewRecyclerView.scrollToPosition(rvPos);
 
                         trackName.setText(musicInfo.getMusicName());
                         artistName.setText(musicInfo.getArtist());
@@ -298,6 +309,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
                                     musicInfo = dataSnapshot.getValue(MusicInfo.class);
 
+                                    coverURL = musicInfo.getCoverURL();
+                                    adapter.notifyDataSetChanged();
+                                    previewRecyclerView.scrollToPosition(rvPos);
+
                                     try {
                                         stop();
                                         mPlayer.reset();
@@ -364,6 +379,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                                                 musicInfo = child.getValue(MusicInfo.class);
 
                                                 String setDataSourceURL = musicInfo.getMusicURL();
+
+                                                coverURL = musicInfo.getCoverURL();
+                                                adapter.notifyDataSetChanged();
+                                                previewRecyclerView.scrollToPosition(rvPos);
 
                                                 firebaseDatabase.getReference("lastMusicName").setValue(musicInfo.getMusicName() + "_" + musicInfo.getArtist());
 
@@ -442,6 +461,10 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                     musicInfo = dataSnapshot.getValue(MusicInfo.class);
+
+                    coverURL = musicInfo.getCoverURL();
+                    adapter.notifyDataSetChanged();
+                    previewRecyclerView.scrollToPosition(rvPos);
 
                     try {
                         stop();
@@ -565,8 +588,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     public void makeToastNotInternetConnection() {
         Toast.makeText(MainActivity.this, "Нет подключения к интернету!", Toast.LENGTH_LONG).show();
     }
-
-
 
 
 }
